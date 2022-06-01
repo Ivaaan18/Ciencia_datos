@@ -1,0 +1,215 @@
+---
+title: "Estadística descriptiva - Ejercicios"
+author: "Eudald"
+date: "15/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T, message = F, warning = F)
+library(dplyr)
+```
+
+# Ejercicio 1
+
+```{r}
+vals <- c(49, 48, 43, 42, 49, 41, 42, 43, 44, 44, 51, 53, 54, 51, 59, 58, 57, 
+          56, 54, 51, 54, 53, 64, 62, 64, 63, 62, 61, 62, 68, 68, 67, 66, 69)
+```
+
+```{r}
+mean(vals)
+```
+
+```{r}
+df <- data.frame(vals) %>% 
+  mutate(
+    cut5 = case_when(
+      vals < 45 ~ 42.5,
+      vals < 50 ~ 47.5,
+      vals < 55 ~ 52.5,
+      vals < 60 ~ 57.5,
+      vals < 65 ~ 62.5,
+      T ~ 67.5
+    )
+  )
+```
+
+```{r}
+sd(df$cut5)
+var(df$cut5)
+```
+
+Ejercicio 2
+
+```{r}
+ea <- rnorm(100, mean = 142, sd = 10)
+eap <- ea * 1.15
+var(ea)
+var(eap)
+```
+
+```{r}
+ec <- rnorm(170, mean = 149, sd = 11)
+ecp <- ec + 20
+var(ec)
+var(ecp)
+```
+
+Ejercicio 3
+
+```{r}
+edad <- 6:15
+alumnos <- c(10787, 124010, 11911, 12812, 12239, 12484, 13090, 10950, 5063, 1259)
+df <- data.frame(edad = edad, alumnos = alumnos)
+```
+
+```{r}
+library(weights)
+sqrt(wtd.var(df$edad, weights = df$alumnos))
+```
+
+```{r}
+df %>% 
+  ggplot(aes(x = edad, y = alumnos))+
+  geom_point()
+```
+
+
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+df <- data.frame(antes = ea, después = eap)
+df %>%
+  tidyr::pivot_longer(cols = everything()) %>%
+  ggplot(aes(name, value)) +
+  geom_boxplot()
+```
+
+Ejercicio 4
+
+```{r}
+temp <- c(10, 28, 30, 35, 20, 12, 27, 25)
+litros <- c(26, 82, 98, 103, 60, 35, 68, 71)
+df <- data.frame(temp = temp, litros = litros)
+```
+
+```{r}
+cor(df$temp, df$litros)
+```
+
+```{r}
+plot(df$temp, df$litros)
+```
+
+```{r}
+df %>% 
+  ggplot(aes(temp, litros)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = F)
+```
+
+# Distribuciones de probabilidad
+
+## Ejercicio 1
+
+```{r, eval=F}
+?pbinom
+```
+
+```{r}
+size <- 9
+prob <- 1/20
+```
+
+```{r}
+vals <- 0:20
+db <- dbinom(vals, size = size, prob = prob)
+plot(vals, db)
+```
+
+Exactamente 5:
+
+```{r}
+dbinom(5, size = size, prob = prob)
+```
+
+5 o más:
+
+```{r}
+pbinom(4, size = size, prob = prob, lower.tail = F)
+```
+
+2 o más:
+
+```{r}
+pbinom(1, size = size, prob = prob, lower.tail = F)
+```
+
+## Ejercicio 3
+
+5 clientes al día
+
+```{r}
+lambda <- 5
+```
+
+Probabilidad de exactamente 8 clientes:
+
+```{r}
+dpois(8, lambda = lambda)
+```
+
+Probabilidad de 8 o más:
+
+```{r}
+ppois(7, lambda = lambda, lower.tail = F)
+```
+
+```{r}
+1 - ppois(7, lambda = lambda)
+```
+
+
+```{r}
+lambda <- 10
+ppois(19, lambda = lambda, lower.tail = F)
+```
+
+## Ejercicio 4
+
+```{r}
+plot(-10:60, dnorm(-10:60, mean=25, sd=10))
+abline(v = c(20, 32), col="red")
+abline(v = 25 + c(-5, 5), col="blue")
+```
+
+```{r}
+dat <- data.frame(x = -10:60, y = dnorm(-10:60, mean=25, sd=10))
+dat %>% 
+  ggplot(aes(x, y)) + 
+  geom_line() +
+  geom_ribbon(data = subset(dat, x > 30), aes(ymax=y), ymin=0, fill="blue", alpha = .5) +
+  geom_ribbon(data = subset(dat, x < 20), aes(ymax=y), ymin=0, fill="blue", alpha = 0.5) +
+  theme_bw()
+```
+
+```{r}
+p32 <- pnorm(32, mean = 25, sd = 10)
+p20 <- pnorm(20, mean = 25, sd = 10)
+```
+
+```{r}
+p32-p20
+```
+
+b) que la temperatura difieran en 5 grados:
+
+```{r}
+pnorm(30, mean = 25, sd = 10, lower.tail = F) + 
+  pnorm(20, mean = 25, sd = 10, lower.tail = T)
+```
+

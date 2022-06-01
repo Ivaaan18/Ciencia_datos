@@ -1,0 +1,100 @@
+---
+title: "Ejercicios descriptiva"
+author: "Eudald"
+date: "21/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, warning = F)
+library(dplyr)
+```
+
+# Ejercicio final
+
+```{r}
+df <- readxl::read_excel("data/nadons.xlsx") %>% 
+  mutate(across(where(is.character), as.factor))
+```
+
+## A. Clasifica las variables de la base de datos, teniendo en cuenta su escala de medida, en variables cualitativas nominales, cualitativas ordinales, cuantitativas discretas o cuantitativas continuas.
+
+
+ID -> No se usa. 
+BAJOPESO -> Cualitativa nominal.
+CLASE -> Cualitativa ordinal.
+EDAD -> Cuantitativa continua.
+FUMAR -> Cualitativa nominal.
+VISITAS -> Cuantitativa discreta.
+PESO -> Cuantitativa continua.
+
+## B. ¿Cuál es la media del peso de los bebés al nacer? y la mediana? y la varianza? y la desviación estándar? y el primer y el tercer cuartil? Valora los resultados.
+
+
+Media y cuarticles:
+
+```{r}
+summary(df$PESO)
+```
+
+Varianza:
+
+```{r}
+sd(df$PESO) ^2
+```
+
+Desviación estándar
+
+```{r}
+sd(df$PESO)
+```
+
+## C. Calcula qué porcentaje de madres habían fumado durante el embarazo. ¿Cómo representarías gráficamente este resultado?
+
+
+```{r}
+prop.table(table(df$FUMAR))
+```
+
+```{r}
+plot(df$FUMAR)
+```
+
+## D. Representa en una tabla de frecuencias el número de visitas a ginecología durante el primer trimestre del embarazo. ¿Cómo representarías gráficamente esta variable? ¿Qué número y porcentaje de madres habían hecho al menos una visita?
+
+
+```{r}
+table(df$VISITAS)
+```
+
+```{r}
+plot(as.factor(df$VISITAS))
+```
+
+Al menos una visita:
+
+```{r}
+sum(df$VISITAS > 0)
+```
+
+En procentage:
+
+```{r}
+sum(df$VISITAS)/nrow(df) * 100
+```
+
+## E. Calcula ahora los mismos estadísticos del apartado B (media del peso del bebé, etc) primero si las madres habían fumado durante el embarazo y luego si las madres habían fumado durante el embarazo. Valoran los resultados.
+
+
+```{r}
+psych::describeBy(df$PESO, df$FUMAR)
+```
+ 
+
+## F. ¿Cómo representarías gráficamente los estadísticos del apartado E? Hazlo y valoran lo que observes.
+ 
+```{r}
+plot(PESO ~ FUMAR, df)
+```
+
+ 

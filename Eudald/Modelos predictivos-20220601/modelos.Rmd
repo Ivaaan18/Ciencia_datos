@@ -1,0 +1,81 @@
+---
+title: "Modelos de predicción"
+author: "Eudald"
+date: "21/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, warning = F)
+library(dplyr)
+```
+
+# Regresión lineal
+
+## MOD - Diapositiva 1: Regresión Univariante
+
+```{r}
+model <- lm(Sepal.Length ~ Petal.Length, iris)
+summary(model)
+```
+
+## MOD - Diapositiva 2: Regresión Multivariante
+
+```{r}
+model <- lm(Sepal.Length ~ ., iris)
+summary(model)
+```
+
+# MOD - Diapositiva 3: Subset selection
+
+```{r}
+library(MASS)
+# Fit the full model 
+full.model <- lm(Fertility ~., data = swiss)
+summary(full.model)
+```
+
+```{r}
+# Stepwise regression model
+step.model <- stepAIC(full.model, direction = "both", 
+                      trace = FALSE)
+summary(step.model)
+```
+
+## MOD - Diapositiva 4: Regresión logística
+
+```{r}
+iris1 <- iris %>% 
+  filter(Species != "setosa") %>% 
+  mutate(Species = droplevels(Species))
+```
+
+```{r}
+logmod <- glm(Species ~ Sepal.Length + Sepal.Width, iris1, family = "binomial")
+summary(logmod)
+```
+
+# MOD: Ejemplos
+
+```{r}
+df <- mtcars %>% 
+  mutate(
+    am = factor(am, levels = 0:1, labels = c("automatic", "manual")),
+    vs = factor(vs, levels = 0:1, labels = c("v-shaped", "straight"))
+  )
+```
+
+```{r}
+mod <- lm(mpg ~ ., df)
+summary(mod)
+```
+
+```{r}
+step.model <- stepAIC(mod, direction = "both", trace = FALSE)
+summary(step.model)
+```
+
+```{r}
+plot(step.model)
+```
+
